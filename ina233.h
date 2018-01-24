@@ -47,4 +47,8 @@ int const MFR_CALIBRATION 		= 0xD4;
 int const MFR_DEVICE_CONFIG  	= 0xD5;
 int const CLEAR_EIN 			= 0xD6;
 
+// Scaling factors
+double const VIN_LSB_VALUE_V 	= 0.00125;
+double const VSHUNT_LSB_VALUE_V = 0.0000025;
+
 #endif
