@@ -12,16 +12,25 @@
 class ina233
 {
 	public:
-		ina233(int address);		//TODO init options
+		ina233(int address, double Rshunt, double Imax);		//TODO init options
 		int readBusVoltageCode();
 		int readShuntVoltageCode();
 		int readPowerCode();
+		int readCurrentCode();
+		
 		double readBusVoltage();
 		double readShuntVoltage();
 		double readPower();
+		double readCurrent();
+		
+		void configureADC(char avgMode, char busConvTime, char shuntConvTime );
+		void configureShuntValue( ?? );
+		void clearFaults();
 	private:
 		int _readTwoByteRegister();
 		int _address;
+		double _Rshunt;					// value of shunt resistor
+		double _Imax;					// full-scale current chosen
 		// TODO configuration settings
 };
 
