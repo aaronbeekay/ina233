@@ -24,13 +24,15 @@ class ina233
 		double readCurrent();
 		
 		void configureADC(char avgMode, char busConvTime, char shuntConvTime );
-		void configureShuntValue( ?? );
+		void configureShuntValue( double Rshunt, double Imax );
 		void clearFaults();
 	private:
 		int _readTwoByteRegister();
 		int _address;
 		double _Rshunt;					// value of shunt resistor
 		double _Imax;					// full-scale current chosen
+		double _currentLSB;
+		double _powerLSB;
 		// TODO configuration settings
 };
 

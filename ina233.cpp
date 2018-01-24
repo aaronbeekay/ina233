@@ -90,9 +90,28 @@ void clearFaults()
 	// TODO
 }
 
-void configureShuntValue( ?? )
+/* 
+	Automagically configure the MFR_CALIBRATION register that sets the scaling factor inside the INA233.
+	Arguments:
+		Rshunt: value of the shunt resistor connected to the device, in ohms
+		Imax: maximum expected current, in amps (single-sided, so +-150A measurement -> Imax = 150)
+	This function does the math internally and sets the configuration register according to TI's datasheet recommendations. If you want full control over the exact calibration value to be set, you should do the math offline and set the register with your own static value.
+ */
+void configureShuntValue( double Rshunt, double Imax )
 {
-
+	_currentLSB = Imax/32768;
+	_powerLSB = _currentLSB*25;							// fixed inside INA233
+	int cal = (int)(0.00512/(_currentLSB*Rshunt));		// per TI datasheet
+	
+	// Write value to cal register
+	Wire.beginTransmission( _address );
+	Wire.write( MFR_CALIBRATION );
+	Wire.write( (uint8_t)(cal & 0x00FF) );				// write LSB
+	Wire.write( (uint8_t)((cal & 0xFF00)>>8) );			// write MSB
+	Wire.endTransmission();
+	
+	//TODO read the value back lol
+	
 }
 
 int _readTwoByteRegister( int register )
