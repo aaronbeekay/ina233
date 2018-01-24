@@ -16,36 +16,29 @@ ina233::ina233(int address)
 
 int readBusVoltageCode()
 {
-	int code = 0;
-	
-	Wire.beginTransmission( _address );			// send dev address
-	Wire.write( READ_VIN );						// send register
-	Wire.endTransmission( false );				// repeated START
-	Wire.requestFrom( _address, 2, true );		// read data
-	
-	while( !Wire.available() ){ yield(); };		// wait for reply
-	code += Wire.read();						// LSB is sent first
-	while( !Wire.available() ){ yield(); };		// wait for reply
-	code += Wire.read() << 8;					// then MSB
-												// TODO: what if it doesn't reply?
+	int code = _readTwoByteRegister( READ_VIN );
 	return code;
 }
 
 int readShuntVoltageCode()
 {
-	int code = 0;
-	
-	Wire.beginTransmission( _address );			// send dev address
-	Wire.write( MFR_READ_VSHUNT );				// send register
-	Wire.endTransmission( false );				// repeated START
-	Wire.requestFrom( _address, 2, true );		// read data
-	
-	while( !Wire.available() ){ yield(); };		// wait for reply
-	code += Wire.read();						// LSB is sent first
-	while( !Wire.available() ){ yield(); };		// wait for reply
-	code += Wire.read() << 8;					// then MSB
-												// TODO: what if it doesn't reply?
+	int code = _readTwoByteRegister( MFR_READ_VSHUNT );
 	return code;
+}
+
+int readPowerCode()
+{
+	int code = _readTwoByteRegister( READ_PIN );
+	return code;
+}
+
+double readPower()
+{
+	int code = readPowerCode();
+	// TODO set scaling appropriately by current config
+	double power = 0.0;
+	
+	return power;
 }
 
 double readBusVoltage()
@@ -63,3 +56,21 @@ double readShuntVoltage()
 	
 	return shuntVoltage;
 }
+
+int _readTwoByteRegister( int register )
+{
+	int code = 0;
+	
+	Wire.beginTransmission( _address );			// send dev address
+	Wire.write( register );				// send register
+	Wire.endTransmission( false );				// repeated START
+	Wire.requestFrom( _address, 2, true );		// read data
+	
+	while( !Wire.available() ){ yield(); };		// wait for reply
+	code += Wire.read();						// LSB is sent first
+	while( !Wire.available() ){ yield(); };		// wait for reply
+	code += Wire.read() << 8;					// then MSB
+												// TODO: what if it doesn't reply?
+	return code;
+}
+

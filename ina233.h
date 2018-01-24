@@ -15,9 +15,12 @@ class ina233
 		ina233(int address);		//TODO init options
 		int readBusVoltageCode();
 		int readShuntVoltageCode();
+		int readPowerCode();
 		double readBusVoltage();
 		double readShuntVoltage();
+		double readPower();
 	private:
+		int _readTwoByteRegister();
 		int _address;
 		// TODO configuration settings
 };
