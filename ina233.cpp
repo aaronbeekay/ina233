@@ -112,8 +112,8 @@ void ina233::readAccumulator()
 	uint32_t	powerAccumulator;
 	uint32_t	sampleCount;
 	uint32_t	accumulatorReadTime;
-	double	averagePower;
-	double	averageEnergy;
+	double		averagePower;
+	double		energy;
 	
 	Wire.beginTransmission( _address );
 	Wire.write( READ_EIN );
@@ -124,13 +124,13 @@ void ina233::readAccumulator()
 										//	sure when the INA233 commits the data
 										//	but this is a good compromise for now
 						
-	// First three bytes: power accumulator value and overflow count
+	
 	while( !Wire.available() ){ yield(); }; 	// wait for reply
-	powerAccumulator = Wire.read();				// junk byte - trash it?
-	Serial.print("this should be 6: ");
-	Serial.print(powerAccumulator, DEC);
-	Serial.print("\n");	 
-					 
+	Wire.read();								// INA233 prefixes every accumulator read
+												// with the number "6", irritatingly.
+												// trash this byte
+												
+	// First three bytes: power accumulator value and overflow count				 
 	while( !Wire.available() ){ yield(); }; 	// wait for reply
 	powerAccumulator = Wire.read();				// accumulator LSB
 	while( !Wire.available() ){ yield(); }; 	// wait for next byte
@@ -148,9 +148,7 @@ void ina233::readAccumulator()
 	
 	clearAccumulator();
 	
-	// Convert values to real-world units
-	averagePower = (double)powerAccumulator;	//cast to double first to avoid mult overflow
-	averagePower = averagePower * _powerLSB;	// UMMM does this make sense?
+	// TODO: HANDLE MICROS() WRAP!!! THIS WILL BITE YOU LATER
 	
 	// debug: compare INA233 clock to Arduino clock
 	double intervalArduino = (double)(accumulatorReadTime - lastAccumulatorReadTime) * 0.000001;
@@ -165,8 +163,18 @@ void ina233::readAccumulator()
 	Serial.print(intervalArduino - intervalINA, DEC);
 	Serial.print(" sec\n");
 	// end debug
+	
+	// Convert values to real-world units
+	averagePower = (double)powerAccumulator;	//cast to double first to avoid mult overflow
+	averagePower = averagePower * _powerLSB;
+	averagePower = averagePower / sampleCount;
+	
+	energy = averagePower * intervalArduino;
 
 	lastAccumulatorReadTime = accumulatorReadTime;
+	lastAveragePower = averagePower;
+	lastEnergy = energy;
+	totalEnergy += energy;
 	
 }
 

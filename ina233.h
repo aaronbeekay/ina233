@@ -31,6 +31,7 @@ class ina233
 			
 		double		lastAveragePower;
 		double		lastEnergy;
+		double 		totalEnergy;
 		
 		void		configureADC(char avgMode, char busConvTime, char shuntConvTime );
 		void		configureShuntValue( double Rshunt, double Imax );
