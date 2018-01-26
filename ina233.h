@@ -38,9 +38,15 @@ class ina233
 		void		clearFaults();
 		void		clearAccumulator();
 		void		readAccumulator();
+		char 		readEINStatus();
+		void		clearEINStatus();
+		
+		void		setEINDirection( uint8_t einDirection );
+		
 		
 	private:
 		int			_readTwoByteRegister( int register );
+		uint8_t 	_readOneByteRegister( uint8_t reg );
 		int			_address;
 		double		_Rshunt;						// value of shunt resistor
 		double		_Imax;							// full-scale current chosen
@@ -48,6 +54,7 @@ class ina233
 		double		_powerLSB;
 		float		_inaBusVoltageSamplePeriod;
 		float		_inaShuntVoltageSamplePeriod;
+		uint8_t		_einDirection;
 		// TODO configuration settings
 };
 
@@ -79,5 +86,10 @@ int const CLEAR_EIN				= 0xD6;
 // Scaling factors
 double const VIN_LSB_VALUE_V	= 0.00125;
 double const VSHUNT_LSB_VALUE_V = 0.0000025;
+
+// Configuration constants
+char const EIN_DIRECTION_POSITIVE = 0b01;
+char const EIN_DIRECTION_NEGATIVE = 0b10;
+char const EIN_DIRECTION_BOTH     = 0b11;
 
 #endif
